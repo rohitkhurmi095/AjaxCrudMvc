@@ -1,0 +1,49 @@
+﻿@model ClothBazar.Domain.Category
+
+
+<form id="createCategoryForm">
+
+    <!-- MODAL BODY -->
+    <!--============-->
+    <div class="modal-body">
+
+        <!-- ROW1 -->
+        <div class="row">
+
+            <!--Category Name-->
+            <!----------------->
+            <div class="form-group col-md-6">
+                @Html.LabelFor(Model => Model.Name)
+                @Html.TextBoxFor(Model => Model.Name, new { @class = "form-control", placeholder = "Category Name" })
+                <!--Error Message-->
+                <span class="text-danger">@Html.ValidationMessageFor(Model => Model.Name)</span>
+            </div>
+
+            <!-- Category Description-->
+            <!------------------------->
+            <div class="form-group col-md-6">
+                @Html.LabelFor(Model => Model.Description)
+                @Html.TextBoxFor(Model => Model.Description, new { @class = "form-control", placeholder = "Description" })
+                <!-- Error Message-->
+                <span class="text-danger">@Html.ValidationMessageFor(Model => Model.Description)</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <!--==============-->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" onClick="createCategory()">Add</button> &nbsp;&nbsp;
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+    </div>
+
+</form>
+
+
+
+
+
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

@@ -1,0 +1,313 @@
+﻿@{
+    ViewBag.Title = "Categories";
+}
+
+
+<h2>Categories</h2>
+
+
+
+
+<!-- Add New Category Button -->
+<div style="margin-top:10px;">
+    <button type="button" class="btn btn-primary" style="margin-bottom:10px;" data-toggle="" id="newBtn">Add New</button>
+</div>
+
+<!-- Categories Table -->
+<!--==================-->
+<table id="categoriesTable" class="display">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+</table>
+
+
+<!-- Modal -->
+<!--=======-->
+<!-- Category Create Form -->
+<div id="categoriesModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel">Create Category</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="categoriesModalBody">
+                <!-- Categories Form will be shown here-->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Category Update Form -->
+<div id="categoriesUpdateModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel">Update Category</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="categoriesUpdateModalBody">
+                <!-- Categories Form will be shown here-->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--=========-->
+<!-- SCRIPTS -->
+<!--=========-->
+@section scripts{
+
+<script>
+
+    //====================
+    //POST CREATE Category
+    //======================
+    function createCategory() {
+
+        //form instance
+        var form = $("#createCategoryForm");
+
+        //if form is Invalid
+        if (!form.valid()) {
+            return false;
+            console.log("CREATE FORM is Invalid!");
+        }
+        //Ajax Call
+        //----------
+        $.ajax({
+            type: "POST",
+            url: "/Categories/Create",
+            dataType: 'json',
+            data: $("#createCategoryForm").serialize(),
+            success: function (response) {
+
+                if (response.success) {
+
+                    //Reload DataTable
+                    dataTable.ajax.reload();
+
+                    //Hide Modal
+                    $("#categoriesModal").modal('hide');
+                } else {
+                    console.log(response.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Error! " + errorThrown);
+            }
+
+        });
+
+
+
+    };
+
+
+    //====================
+    //POST UPDATE Category
+    //======================
+    function updateCategory() {
+
+        var form = $("#updateCategoryForm");
+
+        if (!form.valid()) {
+            return false;
+            console.log("UPDATE FORM is Invalid!");
+        }
+
+        //Ajax Call
+        //----------
+        $.ajax({
+            type: "POST",
+            url: "/Categories/Update",
+            dataType: 'json',
+            data: $("#updateCategoryForm").serialize(),
+            success: function (response) {
+
+                if (response.success) {
+
+                    //Reload DataTable
+                    dataTable.ajax.reload();
+
+                    //Hide Modal
+                    $("#categoriesUpdateModal").modal('hide');
+                } else {
+                    console.log(response.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Error! " + errorThrown);
+            }
+
+        });
+    }
+
+
+</script>
+
+<script>
+
+    //=========================
+    //GET CREATE CATEGORY FORM
+    //==========================
+    $("#newBtn").click(function () {
+
+        //AJAX Call
+        //---------
+        $.ajax({
+            type: "GET",
+            url: "/Categories/Create",
+            success: function (response) {
+
+                //Bind Form in Modal
+                $("#categoriesModalBody").html(response);
+
+                //Show Modal
+                $("#categoriesModal").modal('show');
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Error! " + errorThrown);
+            }
+        });
+    });
+
+
+    //=======================
+    //GET EDIT Category FORM
+    //=======================
+    function editCategory(Id) {
+
+        //AJAX Call Update
+        //----------------
+        $.ajax({
+            type: "GET",
+            url: "/Categories/Update",
+            data: {
+                Id: Id
+            },
+            success: function (response) {
+
+                //Bind Form in Modal
+                $("#categoriesUpdateModalBody").html(response);
+
+                //Show Modal
+                $("#categoriesUpdateModal").modal('show');
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Error! " + errorThrown);
+            }
+        });
+    };
+
+
+    //======================
+    //DELETE Category Post
+    //======================
+    function deleteCategory(Id) {
+
+        if (confirm("Are you sure you want to delete this record?") == true) {
+            //AJAX Call Delete
+            //----------------
+            $.ajax({
+                type: "POST",
+                url: "/Categories/Delete",
+                data: {
+                    Id: Id
+                },
+                success: function (response) {
+                    if (response.success) {
+
+                        //Reload Datatable
+                        dataTable.ajax.reload();
+
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Error! " + errorThrown);
+                }
+            });
+
+        };
+    };
+</script>
+
+
+<script>
+    //When Document is ready
+    $(document).ready(function () {
+
+        //==============================
+        //Load DATA -> JQuery DataTable
+        //===============================
+        dataTable = $('#categoriesTable').DataTable({
+            //Get Table data using Ajax
+            "ajax": {
+                "url": "/Categories/GetCategories",
+                "type": "POST",
+                "dataType": "json",
+            },
+            //PageSize
+            "lengthMenu": [[3, 5, 8, -1], [3, 5, 8, "All"]],
+            //Text options
+            "language": {
+                "lengthMenu": "Display _MENU_ records per page",
+                "info": "Showing page _PAGE_ of _PAGES_",
+                "infoEmpty": "No records available",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+            },
+            //Columns Data binded
+            "columns": [
+                { "data": "Id" },
+                { "data": "Name" },
+                { "data": "Description" },
+                {
+                    //Edit/Id
+                    "data": "Id",
+                    "width": "50px",
+                    "orderable": false,
+                    "searchable": false,
+                    "render": function (data) {
+                        return '<button class="btn btn-warning" onClick="editCategory(' + data + ')">Edit</button>'
+                    }
+
+                },
+                {
+                    //Delete/Id
+                    "data": "Id",
+                    "width": "50px",
+                    "orderable": false,
+                    "searchable": false,
+                    "render": function (data) {
+                        return '<button class="btn btn-danger" onClick="deleteCategory(' + data + ')">Delete</button>'
+                    }
+
+                }
+            ]
+        });
+
+    });
+</script>
+
+}
+
+
+
